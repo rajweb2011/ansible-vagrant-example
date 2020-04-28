@@ -1,0 +1,10 @@
+---
+- hosts: web_nodes
+  become: true
+  tasks:
+     - name: Update apt-cache 
+       command: 'id'
+     - name: 'my script is running now ..... '
+       script: /tmp/hellow.sh
+        
+

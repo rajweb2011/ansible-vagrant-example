@@ -1,0 +1,12 @@
+#this is my local inventory file which is from my mac book to ---> to vagrant dbnode1 2 and 
+
+controller ansible_connection=local
+webnode1 ansible_host=172.17.178.21 ansible_ssh_user=vagrant ansible_ssh_private_key_file=/Users/Raj/devops/Ansible/vagrant-env-ansible/.vagrant/machines/webnode1/virtualbox/private_key
+webnode2 ansible_host=172.17.178.22 ansible_ssh_user=vagrant ansible_ssh_private_key_file=/Users/Raj/devops/Ansible/vagrant-env-ansible/.vagrant/machines/webnode2/virtualbox/private_key
+dbnode1 ansible_host=172.17.178.23 ansible_ssh_user=vagrant ansible_ssh_private_key_file=/Users/Raj/devops/Ansible/vagrant-env-ansible/.vagrant/machines/dbnode1/virtualbox/private_key
+dbnode2 ansible_host=172.17.178.24 ansible_ssh_user=vagrant ansible_ssh_private_key_file=/Users/Raj/devops/Ansible/vagrant-env-ansible/.vagrant/machines/dbbnode2/virtualbox/private_key
+
+[web_nodes]
+webnode[1:2]
+dbnode1
+
