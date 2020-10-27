@@ -10,4 +10,23 @@
     - fail:
         msg: /VAGRANT does not have the minimum space 10% required to continue CURRENT USAGE % {{ tmp_freespace.stdout }} 
       when: tmp_freespace.stdout <= "57"
+      
+      
+---
+- name: MariaDB
+  hosts: dbnode1
+
+  tasks:
+
+    
+    - name: data stage 1.1| checking job status
+      shell: grep -i "Nominal extract finished" /opt/nominal-data-load/plxExtract_$(date +%Y-%m-%d).log | awk '{$1=""; print $0}'
+      register: job_status
+
+    - fail:
+        msg: 'Data stage 1.1| checking job status Failed ' # not required. The customized message used for failing execution. If omitted, fail will simply bail out with a generic message.
+      when: job_status.stdout != ' - Nominal extract finished'
+
+
+
 
