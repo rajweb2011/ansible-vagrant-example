@@ -1,27 +1,15 @@
----
-- name: MariaDB
-  hosts: web_nodes
-
-  tasks:
-    - name: Check /home freespace morethen 10% avaible 
-      shell: df  /vagrant | egrep -o '[0-9]+%' | cut -d'%' -f1
-      register: tmp_freespace
-        
-    - fail:
-        msg: /VAGRANT does not have the minimum space 10% required to continue CURRENT USAGE % {{ tmp_freespace.stdout }} 
-      when: tmp_freespace.stdout <= "57"
-      
-      
 
 ---
 - name: MariaDB
   hosts: dbnode1
   become: yes
+  vars: 
+    path1: /opt/nominal-data-load/
+    path2: /opt/
   
 
   tasks:
-
-    
+  
     - name: data stage 1.1| checking job status
       shell: grep -i "Nominal extract finished" /opt/nominal-data-load/plxExtract_$(date +%Y-%m-%d).log | awk '{$1=""; print $0}'
       register: job_status
@@ -36,8 +24,7 @@
       register: test_status
     - debug:
         msg: value is here "{{ test_status.stdout }}" # not required. The customized message that is printed. If omitted, prints a generic message.
-        
-       
+      
 
   #chekcing cron tab  comment out working > crontab -l | sed '/demo.sh/s/^/#/' | crontab -
     #uncomment crontab -l | sed -e 's=^#\(.*/opt/demo.sh$\)=\1=' | crontab -    
@@ -48,10 +35,35 @@
     - name: check current status
       shell: crontab -l
 
-
     - name: uncomment line 
       shell: crontab -l | sed -e 's=^#\(.*/opt/demo.sh$\)=\1=' | crontab -
 
+# Databse count example is nbelow 
+    - name: testing db count script 
+      shell: mysql books -e "SELECT count(1) FROM authors" | tail -1
+      register: db_count
+    - debug: var=db_count.stdout
+
+    - fail:
+        msg: 'PLX hellow  "{{ db_count.stdout }}"'
+      when: db_count.stdout == ""
+
+#  1.3  copy latest file  
+    - name: find latest file and copy from folder  
+      shell: ls -t *.bz2 | head -n 1
+      args:
+        chdir: "{{ path1 }}"
+      register: find_latstfile
+    - debug: var=find_latstfile.stdout
 
 
+# 1.3 checking unarchive zip file 
+# checking bzip file linux  "{{ path1 }}/{{ find_latstfile.stdout }}"
 
+    - name: Unarchive a file that is already on the remote machine
+      shell: bzip2 -d "{{ find_latstfile.stdout }}"
+      args:
+        chdir: "{{ path1 }}" 
+      register: unzipfile
+    - debug: var=unzipfile.stdout
+        
