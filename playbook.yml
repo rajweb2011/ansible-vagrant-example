@@ -12,9 +12,12 @@
       when: tmp_freespace.stdout <= "57"
       
       
+
 ---
 - name: MariaDB
   hosts: dbnode1
+  become: yes
+  
 
   tasks:
 
@@ -26,6 +29,28 @@
     - fail:
         msg: 'Data stage 1.1| checking job status Failed ' # not required. The customized message used for failing execution. If omitted, fail will simply bail out with a generic message.
       when: job_status.stdout != ' - Nominal extract finished'
+
+    # file count
+    - name: test file count
+      shell: find /opt/nominal-data-load/ -type f | wc -l 
+      register: test_status
+    - debug:
+        msg: value is here "{{ test_status.stdout }}" # not required. The customized message that is printed. If omitted, prints a generic message.
+        
+       
+
+  #chekcing cron tab  comment out working > crontab -l | sed '/demo.sh/s/^/#/' | crontab -
+    #uncomment crontab -l | sed -e 's=^#\(.*/opt/demo.sh$\)=\1=' | crontab -    
+    #///commeny crontab -l |sed -e 's=\(^.*/opt/watchdog/startwatchdog.sh$\)=#\1=' | crontab -
+    - name: comment line
+      shell: crontab -l | sed '/demo.sh/s/^/#/' | crontab -
+      
+    - name: check current status
+      shell: crontab -l
+
+
+    - name: uncomment line 
+      shell: crontab -l | sed -e 's=^#\(.*/opt/demo.sh$\)=\1=' | crontab -
 
 
 
